@@ -18,9 +18,10 @@ export default function HomePage() {
   useEffect(() => {
     setCanSummarize(output?.length > 150)
   }, [output])
+
   const detectLanguage = async (text) => {
     try {
-      const languageDetectorCapabilities = await self.ai.languageDetector.capabilities()
+      const languageDetectorCapabilities = await self.ai.languageDetector?.capabilities()
       const canDetect = languageDetectorCapabilities.capabilities
       let detector
 
