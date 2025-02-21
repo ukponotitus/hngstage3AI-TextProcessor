@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import TextProcessor from "../shared/components/input"
 import DisplayTextComponent from "../shared/components/outputdisplay"
 import UserLayout from "../shared/layout"
+// import { LANGUAGES } from "../shared/components/outputdisplay"
 
 export default function HomePage() {
   const [inputText, setInputText] = useState("")
@@ -14,65 +15,75 @@ export default function HomePage() {
   const [isTranslating, setIsTranslating] = useState(false)
   const [consoleMessage, setConsoleMessage] = useState(null)
   const [detectedLanguage, setDetectedLanguage] = useState(null)
-
   useEffect(() => {
     setCanSummarize(output?.length > 150)
   }, [output])
-
+  
+  // language detect function
   const detectLanguage = async (text) => {
     try {
       const languageDetectorCapabilities = await self.ai.languageDetector?.capabilities()
-      const canDetect = languageDetectorCapabilities.capabilities
+      const canDetect = languageDetectorCapabilities?.capabilities
       let detector
 
       if (canDetect === "no") {
         setError("Language detection is not available in this browser.")
       }
       if (canDetect === "readily") {
-        detector = await self.ai.languageDetector.create()
+        detector = await self.ai.languageDetector?.create()
       } else {
-        detector = await self.ai.languageDetector.create({
+        detector = await self.ai.languageDetector?.create({
           monitor(m) {
             m.addEventListener("downloadprogress", (e) => {
               setConsoleMessage(`Downloaded ${e.loaded} of ${e.total} bytes for language detection.`)
             })
           },
         })
-        await detector.ready
+        await detector?.ready
       }
-      const result = await detector.detect(text)
-      return result.language
+      const result = await detector?.detect(text)
+      return result?.language
     } catch (error) {
       console.error("Language detection failed:", error)
-      throw error
+      setError(error)
     }
   }
+
+  // submit function
   const handleSubmit = async () => {
-    setIsProcessing(true)
-    setError(null)
-    setConsoleMessage(null)
+    setIsProcessing(true);
+    setError(null);
+    setConsoleMessage(null);
     try {
       if (!inputText.trim()) {
-        setError("Please enter some text before submitting.")
+        setError("Please enter some text before submitting.");
       }
-      setOutput(inputText)
-      const detectedLang = await detectLanguage(inputText)
-      setDetectedLanguage(detectedLang)
+      setOutput(inputText);
+      const detectedLang = await detectLanguage(inputText);
+      console.log("Raw detected language:", detectedLang); 
+      if (!detectedLang) {
+        console.log("Could not detect language.");
+      }
+      setDetectedLanguage(detectedLang);
+      // const languageName = LANGUAGES?.find((lang) => lang.code === detectedLang)?.name || "Unknown";
+      // setConsoleMessage(`Detected language: ${languageName}`);
+      // console.log("detect language", languageName, detectedLang);
     } catch (error) {
-      console.error("Error processing text:", error)
-      setError(error.message)
+      console.error("Error processing text:", error);
+      setError(error.message);
     } finally {
-      setIsProcessing(false)
-      setInputText("")
+      setIsProcessing(false);
+      setInputText(""); 
     }
-  }
+  };
+  // translate function
   const handleTranslate = async () => {
     setIsTranslating(true)
     setError(null)
     setConsoleMessage(null)
     try {
       if (!output || !targetLang) {
-        throw new Error("Please ensure there's text to translate and a target language is selected.")
+        setError("Please ensure there's text to translate and a target language is selected.")
       }
       const translatorCapabilities = await self.ai.translator?.capabilities()
       const result = translatorCapabilities?.languagePairAvailable(detectedLanguage || "en", targetLang)
@@ -108,6 +119,7 @@ export default function HomePage() {
     }
   }
 
+  // summarized function
   const handleSummarize = async () => {
     setIsSummarizing(true)
     setError(null)
@@ -130,7 +142,6 @@ export default function HomePage() {
         format: "markdown",
         length: "medium",
       }
-
       if (available === "readily") {
         summarizer = await self.ai.summarizer.create(options)
       } else {
@@ -140,7 +151,6 @@ export default function HomePage() {
         })
         await summarizer.ready
       }
-
       const summary = await summarizer.summarize(output)
       setOutput(summary)
     } catch (error) {

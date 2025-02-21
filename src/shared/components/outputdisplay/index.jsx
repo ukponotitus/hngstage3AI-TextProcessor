@@ -1,14 +1,13 @@
 import { FileText, Languages } from "lucide-react"
 
-const LANGUAGES = [
+export const LANGUAGES = [
+  { code: "en", name: "English" },
   { code: "es", name: "Spanish" },
   { code: "fr", name: "French" },
-  { code: "en", name: "English" },
   { code: "pt", name: "Portuguese" },
   { code: "ru", name: "Russian" },
   { code: "tr", name: "Turkish" },
 ]
-
 export default function DisplayTextComponent({
   targetLang,
   setTargetLang,
@@ -22,6 +21,8 @@ export default function DisplayTextComponent({
   consoleMessage,
   detectedLanguage,
 }) {
+  const showSummarizeButton = detectedLanguage === "en"
+  const isSummarizeDisabled = !canSummarize || isSummarizing
   return (
     <div className="space-y-4 mt-6">
       <div className="p-3 border rounded min-h-[100px] bg-white">
@@ -33,7 +34,6 @@ export default function DisplayTextComponent({
         </p>
       )}
       {error && <div className="p-2 text-red-600 bg-red-100 border border-red-400 rounded">{error}</div>}
-
       {consoleMessage && <p className="text-sm text-blue-500">{consoleMessage}</p>}
       {output && (
         <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center">
@@ -51,14 +51,16 @@ export default function DisplayTextComponent({
               </option>
             ))}
           </select>
-          <button
-            onClick={handleSummarize}
-            disabled={!canSummarize || isSummarizing}
-            className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            {isSummarizing ? "Processing..." : "Summarize"}
-          </button>
+          {showSummarizeButton && (
+            <button
+              onClick={handleSummarize}
+              disabled={isSummarizeDisabled}
+              className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              {isSummarizing ? "Processing..." : "Summarize"}
+            </button>
+          )}
           <button
             onClick={handleTranslate}
             disabled={isTranslating}
