@@ -27,17 +27,14 @@ export default function DisplayTextComponent({
       <div className="p-3 border rounded min-h-[100px] bg-white">
         <p className="whitespace-pre-wrap break-words">{output || "Output will be displayed here..."}</p>
       </div>
-
       {detectedLanguage && (
         <p className="text-sm text-gray-600">
           Detected Language: {LANGUAGES.find((lang) => lang.code === detectedLanguage)?.name || detectedLanguage}
         </p>
       )}
-
       {error && <div className="p-2 text-red-600 bg-red-100 border border-red-400 rounded">{error}</div>}
 
       {consoleMessage && <p className="text-sm text-blue-500">{consoleMessage}</p>}
-
       {output && (
         <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center">
           <select
@@ -54,7 +51,6 @@ export default function DisplayTextComponent({
               </option>
             ))}
           </select>
-
           <button
             onClick={handleSummarize}
             disabled={!canSummarize || isSummarizing}
@@ -63,7 +59,6 @@ export default function DisplayTextComponent({
             <FileText className="mr-2 h-4 w-4" />
             {isSummarizing ? "Processing..." : "Summarize"}
           </button>
-
           <button
             onClick={handleTranslate}
             disabled={isTranslating}

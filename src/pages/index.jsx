@@ -18,7 +18,6 @@ export default function HomePage() {
   useEffect(() => {
     setCanSummarize(output?.length > 150)
   }, [output])
-
   const detectLanguage = async (text) => {
     try {
       const languageDetectorCapabilities = await self.ai.languageDetector.capabilities()
@@ -28,7 +27,6 @@ export default function HomePage() {
       if (canDetect === "no") {
         setError("Language detection is not available in this browser.")
       }
-
       if (canDetect === "readily") {
         detector = await self.ai.languageDetector.create()
       } else {
@@ -41,7 +39,6 @@ export default function HomePage() {
         })
         await detector.ready
       }
-
       const result = await detector.detect(text)
       return result.language
     } catch (error) {
@@ -49,7 +46,6 @@ export default function HomePage() {
       throw error
     }
   }
-
   const handleSubmit = async () => {
     setIsProcessing(true)
     setError(null)
@@ -69,8 +65,6 @@ export default function HomePage() {
       setInputText("")
     }
   }
-
-  // Function to handle text translation
   const handleTranslate = async () => {
     setIsTranslating(true)
     setError(null)
@@ -79,14 +73,12 @@ export default function HomePage() {
       if (!output || !targetLang) {
         throw new Error("Please ensure there's text to translate and a target language is selected.")
       }
-
       const translatorCapabilities = await self.ai.translator?.capabilities()
       const result = translatorCapabilities?.languagePairAvailable(detectedLanguage || "en", targetLang)
 
       if (result === "no") {
         setError("It's not possible for this browser to translate as requested.")
       }
-
       let translator
       if (result === "readily") {
         translator = await self.ai.translator?.create({
@@ -104,7 +96,6 @@ export default function HomePage() {
           },
         })
       }
-
       const translatedText = await translator?.translate(output)
       setOutput(translatedText)
       setDetectedLanguage(targetLang)
